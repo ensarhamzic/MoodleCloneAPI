@@ -57,6 +57,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddDbContext<AppDbContext>();
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<SmeroviService>();
+builder.Services.AddScoped<ZvanjeService>();
+builder.Services.AddScoped<TipService>();
 
 builder.Services.AddHttpContextAccessor();
 

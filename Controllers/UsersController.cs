@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MoodleCloneAPI.Data.Services;
-using MoodleCloneAPI.Data.ViewModels;
+using MoodleCloneAPI.Data.ViewModels.Requests;
 
 namespace MoodleCloneAPI.Controllers
 {
@@ -64,6 +64,48 @@ namespace MoodleCloneAPI.Controllers
             try
             {
                 var response = userService.Login(request);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("email-exists/{email}")]
+        public IActionResult EmailExists(string email)
+        {
+            try
+            {
+                var response = userService.EmailExists(email);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("username-exists/{username}")]
+        public IActionResult UsernameExists(string username)
+        {
+            try
+            {
+                var response = userService.UsernameExists(username);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("jmbg-exists/{jmbg}")]
+        public IActionResult JMBGExists(string jmbg)
+        {
+            try
+            {
+                var response = userService.JMBGExists(jmbg);
                 return Ok(response);
             }
             catch (Exception ex)

@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using MimeKit;
 using MimeKit.Text;
 using MoodleCloneAPI.Data.Models;
-using MoodleCloneAPI.Data.ViewModels;
+using MoodleCloneAPI.Data.ViewModels.Requests;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -120,6 +120,21 @@ namespace MoodleCloneAPI.Data.Services
             else
                 throw new Exception(failedResponse);
             return CreateToken(user, role);
+        }
+
+        public bool EmailExists(string email)
+        {
+            return dbContext.Osobe.Any(u => u.Email == email);
+        }
+
+        public bool UsernameExists(string username)
+        {
+            return dbContext.Osobe.Any(u => u.Username == username);
+        }
+
+        public bool JMBGExists(string JMBG)
+        {
+            return dbContext.Osobe.Any(u => u.JMBG == JMBG);
         }
 
         public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

@@ -1,7 +1,7 @@
 ﻿using MoodleCloneAPI.Data.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace MoodleCloneAPI.Data.ViewModels
+namespace MoodleCloneAPI.Data.ViewModels.Requests
 {
     public class TeacherRegisterVM : UserRegisterVM
     {
