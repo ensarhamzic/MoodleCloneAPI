@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MoodleCloneAPI.Data.Services;
 using MoodleCloneAPI.Data.ViewModels.Requests;
@@ -106,6 +107,21 @@ namespace MoodleCloneAPI.Controllers
             try
             {
                 var response = userService.JMBGExists(jmbg);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("check-token")]
+        public IActionResult CheckToken()
+        {
+            try
+            {
+                var response = userService.CheckToken();
                 return Ok(response);
             }
             catch (Exception ex)

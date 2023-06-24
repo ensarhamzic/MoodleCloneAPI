@@ -8,6 +8,7 @@ using MimeKit;
 using MimeKit.Text;
 using MoodleCloneAPI.Data.Models;
 using MoodleCloneAPI.Data.ViewModels.Requests;
+using MoodleCloneAPI.Data.ViewModels.Responses;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -44,6 +45,7 @@ namespace MoodleCloneAPI.Data.Services
                 Prezime = request.Prezime,
                 Username = request.Username,
                 Email = request.Email,
+                Pol = request.Pol,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
             };
@@ -53,7 +55,7 @@ namespace MoodleCloneAPI.Data.Services
             return newUser;
         }
 
-        public string RegisterAdmin(AdminRegisterVM request)
+        public AuthVM RegisterAdmin(AdminRegisterVM request)
         {
             var user = RegisterUser(request);
             var newAdmin = new Administrator()
@@ -64,10 +66,16 @@ namespace MoodleCloneAPI.Data.Services
             dbContext.Administratori.Add(newAdmin);
             dbContext.SaveChanges();
 
-            return CreateToken(user, "Admin");
+            return new AuthVM()
+            {
+                Osoba = user,
+                Token = CreateToken(user, "Admin"),
+                Role = "Admin",
+                Verified = true,
+            };
         }
 
-        public string RegisterTeacher(TeacherRegisterVM request)
+        public AuthVM RegisterTeacher(TeacherRegisterVM request)
         {
             var user = RegisterUser(request);
             var newTeacher = new Nastavnik()
@@ -77,14 +85,21 @@ namespace MoodleCloneAPI.Data.Services
                 TipId = request.TipId,
                 GodineRadnogStaza = request.GodineRadnogStaza,
                 DatumRodjenja = request.DatumRodjenja,
+                Verifikovan = false,
             };
             dbContext.Nastavnici.Add(newTeacher);
             dbContext.SaveChanges();
 
-            return CreateToken(user, "Teacher");
+            return new AuthVM()
+            {
+                Osoba = user,
+                Token = CreateToken(user, "Teacher"),
+                Role = "Teacher",
+                Verified = false,
+            };
         }
 
-        public string RegisterStudent(StudentRegisterVM request)
+        public AuthVM RegisterStudent(StudentRegisterVM request)
         {
             var user = RegisterUser(request);
             var newStudent = new Student()
@@ -95,10 +110,16 @@ namespace MoodleCloneAPI.Data.Services
             dbContext.Studenti.Add(newStudent);
             dbContext.SaveChanges();
 
-            return CreateToken(user, "Student");
+            return new AuthVM()
+            {
+                Osoba = user,
+                Token = CreateToken(user, "Student"),
+                Role = "Student",
+                Verified = true,
+            };
         }
 
-        public string Login(UserLoginVM request)
+        public AuthVM Login(UserLoginVM request)
         {
             var user = dbContext.Osobe.FirstOrDefault(u => u.Username == request.Username);
             var failedResponse = "Check your credentials and try again!";
@@ -110,16 +131,27 @@ namespace MoodleCloneAPI.Data.Services
             var admin = dbContext.Administratori.FirstOrDefault(a => a.OsobaJMBG == user.JMBG);
             var teacher = dbContext.Nastavnici.FirstOrDefault(n => n.OsobaJMBG == user.JMBG);
             var student = dbContext.Studenti.FirstOrDefault(s => s.OsobaJMBG == user.JMBG);
+            var verified = true;
             var role = "";
             if (admin != null)
                 role = "Admin";
             else if (teacher != null)
+            {
                 role = "Teacher";
+                verified = teacher.Verifikovan;
+            }
             else if (student != null)
                 role = "Student";
             else
                 throw new Exception(failedResponse);
-            return CreateToken(user, role);
+                
+            return new AuthVM()
+            {
+                Osoba = user,
+                Token = CreateToken(user, role),
+                Role = role,
+                Verified = verified,
+            };
         }
 
         public bool EmailExists(string email)
@@ -180,6 +212,12 @@ namespace MoodleCloneAPI.Data.Services
             return int.Parse(httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid));
         }
 
+        private Osoba GetAuthUser()
+        {
+            var id = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
+            return dbContext.Osobe.Find(id);
+        }
+
         private void SendEmail(string recipientEmail, string emailSubject, string emailText)
         {
             var email = new MimeMessage();
@@ -204,5 +242,32 @@ namespace MoodleCloneAPI.Data.Services
             smtp.Disconnect(true);
         }
 
+        public AuthVM CheckToken()
+        {
+            var user = GetAuthUser();
+            var admin = dbContext.Administratori.FirstOrDefault(a => a.OsobaJMBG == user.JMBG);
+            var teacher = dbContext.Nastavnici.FirstOrDefault(n => n.OsobaJMBG == user.JMBG);
+            var student = dbContext.Studenti.FirstOrDefault(s => s.OsobaJMBG == user.JMBG);
+            var verified = true;
+            var role = "";
+            if (admin != null)
+                role = "Admin";
+            else if (teacher != null)
+            {
+                role = "Teacher";
+                verified = teacher.Verifikovan;
+            }
+            else if (student != null)
+                role = "Student";
+            else
+                throw new Exception("User not found!");
+            return new AuthVM()
+            {
+                Osoba = user,
+                Token = CreateToken(user, role),
+                Role = role,
+                Verified = verified,
+            };
+        }
     }
 }

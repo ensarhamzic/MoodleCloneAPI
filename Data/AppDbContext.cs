@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using MoodleCloneAPI.Data.Models;
+using MoodleCloneAPI.Data.Services;
 
 namespace MoodleCloneAPI.Data
 {
@@ -49,6 +50,27 @@ namespace MoodleCloneAPI.Data
                 new Zvanje { Id = 3, Naziv = "Docent" },
                 new Zvanje { Id = 5, Naziv = "Saradnik u nastavi" }
             );
+
+            UserService.CreatePasswordHash("admin123", out byte[] passwordHash, out byte[] passwordSalt);
+            modelBuilder.Entity<Osoba>().HasData(
+                new Osoba
+                {
+                    JMBG = "0000000000000",
+                    Ime = "Admin",
+                    Prezime = "Admin",
+                    Username = "admin",
+                    Email = "admin@admin.com",
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    Pol = 'M',
+                });
+
+            modelBuilder.Entity<Administrator>().HasData(
+                new Administrator
+                {
+                    OsobaJMBG = "0000000000000",
+                    Superadmin = true,
+                });
         }
 
         public DbSet<Osoba> Osobe { get; set; }

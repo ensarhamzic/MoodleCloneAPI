@@ -34,24 +34,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             ValidateAudience = false,
         };
-
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = context =>
-            {
-                var accessToken = context.Request.Query["access_token"];
-
-                // If the request is for our hub...
-                var path = context.HttpContext.Request.Path;
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    (path.StartsWithSegments("/api/hubs/chat")))
-                {
-                    // Read the token out of the query string
-                    context.Token = accessToken;
-                }
-                return Task.CompletedTask;
-            }
-        };
     });
 
 builder.Services.AddDbContext<AppDbContext>();
@@ -75,6 +57,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
