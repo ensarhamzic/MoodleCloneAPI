@@ -130,5 +130,63 @@ namespace MoodleCloneAPI.Controllers
             }
         }
 
+        [HttpGet("unverified-teachers")]
+        public IActionResult GetUnverifiedTeachers()
+        {
+            try
+            {
+                var response = userService.GetUnverifiedTeachers();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("verify-teacher/{jmbg}")]
+        public IActionResult VerifyTeacher(string jmbg)
+        {
+            try
+            {
+                var response = userService.VerifyTeacher(jmbg);
+                return Ok(new {message = response});
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("delete-teacher/{jmbg}")]
+        public IActionResult DeleteTeacher(string jmbg)
+        {
+            try
+            {
+                var response = userService.DeleteTeacher(jmbg);
+                return Ok(new { message = response });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("students")]
+        public IActionResult GetStudents()
+        {
+            try
+            {
+                var response = userService.GetStudents();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }

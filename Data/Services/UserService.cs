@@ -60,8 +60,7 @@ namespace MoodleCloneAPI.Data.Services
             var user = RegisterUser(request);
             var newAdmin = new Administrator()
             {
-                OsobaJMBG = user.JMBG,
-                Superadmin = request.Superadmin,
+                OsobaJMBG = user.JMBG
             };
             dbContext.Administratori.Add(newAdmin);
             dbContext.SaveChanges();
@@ -268,6 +267,32 @@ namespace MoodleCloneAPI.Data.Services
                 Role = role,
                 Verified = verified,
             };
+        }
+
+        public List<Nastavnik> GetUnverifiedTeachers()
+        {
+            return dbContext.Nastavnici.Where(n => n.Verifikovan == false).Include(n => n.Osoba).Include(n => n.Zvanje).Include(n => n.Tip).ToList();
+        }
+
+        public List<Student> GetStudents()
+        {
+            return dbContext.Studenti.Include(s => s.Osoba).ToList();
+        }
+
+        public string VerifyTeacher(string jmbg)
+        {
+            var teacher = dbContext.Nastavnici.FirstOrDefault(n => n.OsobaJMBG == jmbg) ?? throw new Exception("Teacher not fouznd!");
+            teacher.Verifikovan = true;
+            dbContext.SaveChanges();
+            return "Teacher verified successfully!";
+        }
+
+        public string DeleteTeacher(string jmbg)
+        {
+            var teacher = dbContext.Nastavnici.FirstOrDefault(n => n.OsobaJMBG == jmbg) ?? throw new Exception("Teacher not fouznd!");
+            dbContext.Nastavnici.Remove(teacher);
+            dbContext.SaveChanges();
+            return "Teacher deleted successfully!";
         }
     }
 }

@@ -8,7 +8,5 @@ namespace MoodleCloneAPI.Data.Models
         public string OsobaJMBG { get; set; }
         [Required]
         public Osoba Osoba { get; set; }
-        [Required]
-        public bool Superadmin { get; set; }
     }
 }

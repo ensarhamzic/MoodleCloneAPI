@@ -68,8 +68,7 @@ namespace MoodleCloneAPI.Data
             modelBuilder.Entity<Administrator>().HasData(
                 new Administrator
                 {
-                    OsobaJMBG = "0000000000000",
-                    Superadmin = true,
+                    OsobaJMBG = "0000000000000"
                 });
         }
 
