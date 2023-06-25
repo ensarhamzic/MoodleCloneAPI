@@ -39,6 +39,7 @@ namespace MoodleCloneAPI.Data
             modelBuilder.Entity<Kurs>().HasOne(k => k.Asistent).WithMany(n => n.KurseviAsistent).HasForeignKey(k => k.AsistentJMBG);
 
             modelBuilder.Entity<StudentSmer>().HasOne(ss => ss.Student).WithMany(s => s.Smerovi).HasForeignKey(ss => ss.StudentJMBG);
+            modelBuilder.Entity<Obavestenje>().HasOne(o => o.Nastavnik).WithMany(n => n.Obavestenja).HasForeignKey(o => o.NastavnikJMBG);
 
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {

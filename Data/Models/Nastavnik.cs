@@ -23,5 +23,6 @@ namespace MoodleCloneAPI.Data.Models
         public bool Verifikovan { get; set; }
         public ICollection<Kurs> Kursevi { get; set; }
         public ICollection<Kurs> KurseviAsistent { get; set; }
+        public ICollection<Obavestenje> Obavestenja { get; set; }
     }
 }

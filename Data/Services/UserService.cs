@@ -96,7 +96,7 @@ namespace MoodleCloneAPI.Data.Services
             {
                 Osoba = user,
                 Token = CreateToken(user, role),
-                Role = "Teacher",
+                Role = role,
                 Verified = false,
             };
         }

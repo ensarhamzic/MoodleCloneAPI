@@ -1,4 +1,5 @@
-﻿using MoodleCloneAPI.Data.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using MoodleCloneAPI.Data.Models;
 using MoodleCloneAPI.Data.ViewModels.Requests;
 
 namespace MoodleCloneAPI.Data.Services
@@ -16,7 +17,7 @@ namespace MoodleCloneAPI.Data.Services
 
         public List<Smer> GetSmerovi()
         {
-            return dbContext.Smerovi.ToList();
+            return dbContext.Smerovi.AsQueryable().Include(s => s.Kursevi).ToList();
         }
 
         public Smer GetSmer(int id)
@@ -60,6 +61,7 @@ namespace MoodleCloneAPI.Data.Services
             dbContext.SaveChanges();
             return "Student dodat na smer";
         }
+
 
 
     }
