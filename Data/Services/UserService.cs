@@ -77,6 +77,7 @@ namespace MoodleCloneAPI.Data.Services
         public AuthVM RegisterTeacher(TeacherRegisterVM request)
         {
             var user = RegisterUser(request);
+            var profesorId = dbContext.Tipovi.FirstOrDefault(t => t.Naziv == "Profesor").Id;
             var newTeacher = new Nastavnik()
             {
                 OsobaJMBG = user.JMBG,
@@ -89,10 +90,12 @@ namespace MoodleCloneAPI.Data.Services
             dbContext.Nastavnici.Add(newTeacher);
             dbContext.SaveChanges();
 
+            var role = profesorId == request.TipId ? "Profesor" : "Asistent";
+
             return new AuthVM()
             {
                 Osoba = user,
-                Token = CreateToken(user, "Teacher"),
+                Token = CreateToken(user, role),
                 Role = "Teacher",
                 Verified = false,
             };
@@ -136,7 +139,8 @@ namespace MoodleCloneAPI.Data.Services
                 role = "Admin";
             else if (teacher != null)
             {
-                role = "Teacher";
+                var profesorId = dbContext.Tipovi.FirstOrDefault(t => t.Naziv == "Profesor").Id;
+                role = profesorId == teacher.TipId ? "Profesor" : "Asistent";
                 verified = teacher.Verifikovan;
             }
             else if (student != null)
@@ -206,12 +210,12 @@ namespace MoodleCloneAPI.Data.Services
             return jwt;
         }
 
-        private int GetAuthUserId()
+        public string GetAuthUserId()
         {
-            return int.Parse(httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid));
+            return httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
         }
 
-        private Osoba GetAuthUser()
+        public Osoba GetAuthUser()
         {
             var id = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
             return dbContext.Osobe.Find(id);
@@ -253,7 +257,8 @@ namespace MoodleCloneAPI.Data.Services
                 role = "Admin";
             else if (teacher != null)
             {
-                role = "Teacher";
+                var profesorId = dbContext.Tipovi.FirstOrDefault(t => t.Naziv == "Profesor").Id;
+                role = profesorId == teacher.TipId ? "Profesor" : "Asistent";
                 verified = teacher.Verifikovan;
             }
             else if (student != null)
@@ -298,6 +303,12 @@ namespace MoodleCloneAPI.Data.Services
         public Student GetStudent(string jmbg)
         {
             return dbContext.Studenti.Include(s => s.Osoba).Include(s => s.Smerovi).ThenInclude(s => s.Smer).FirstOrDefault(s => s.OsobaJMBG == jmbg) ?? throw new Exception("Student not found!");
+        }
+
+        public List<Nastavnik> GetAssistents()
+        {
+            var nastavnikTipId = dbContext.Tipovi.FirstOrDefault(t => t.Naziv == "Asistent").Id;
+            return dbContext.Nastavnici.Where(n => n.TipId == nastavnikTipId).Include(n => n.Osoba).Include(n => n.Zvanje).Include(n => n.Tip).ToList();
         }
     }
 }

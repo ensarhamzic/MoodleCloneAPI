@@ -130,23 +130,21 @@ namespace MoodleCloneAPI.Migrations
                     Naziv = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HronoloskiMod = table.Column<bool>(type: "bit", nullable: false),
                     SmerId = table.Column<int>(type: "int", nullable: false),
-                    ProfesorJMBG = table.Column<int>(type: "int", nullable: false),
-                    ProfesorOsobaJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false),
-                    AsistentJMBG = table.Column<int>(type: "int", nullable: false),
-                    AsistentOsobaJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false)
+                    ProfesorJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false),
+                    AsistentJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Kursevi", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Kursevi_Nastavnici_AsistentOsobaJMBG",
-                        column: x => x.AsistentOsobaJMBG,
+                        name: "FK_Kursevi_Nastavnici_AsistentJMBG",
+                        column: x => x.AsistentJMBG,
                         principalTable: "Nastavnici",
                         principalColumn: "OsobaJMBG",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Kursevi_Nastavnici_ProfesorOsobaJMBG",
-                        column: x => x.ProfesorOsobaJMBG,
+                        name: "FK_Kursevi_Nastavnici_ProfesorJMBG",
+                        column: x => x.ProfesorJMBG,
                         principalTable: "Nastavnici",
                         principalColumn: "OsobaJMBG",
                         onDelete: ReferentialAction.Restrict);
@@ -355,7 +353,7 @@ namespace MoodleCloneAPI.Migrations
             migrationBuilder.InsertData(
                 table: "Osobe",
                 columns: new[] { "JMBG", "Email", "Ime", "PasswordHash", "PasswordSalt", "Pol", "Prezime", "Username" },
-                values: new object[] { "0000000000000", "admin@admin.com", "Admin", new byte[] { 91, 19, 155, 199, 17, 91, 126, 131, 147, 142, 248, 116, 88, 11, 64, 99, 33, 219, 144, 65, 221, 184, 235, 152, 175, 104, 144, 49, 120, 47, 92, 125, 164, 62, 247, 214, 2, 236, 24, 237, 130, 158, 175, 212, 172, 253, 222, 254, 13, 198, 108, 58, 204, 104, 6, 137, 150, 100, 188, 72, 80, 147, 155, 76 }, new byte[] { 173, 250, 158, 178, 12, 24, 214, 32, 94, 38, 183, 49, 142, 56, 26, 155, 100, 199, 163, 26, 204, 86, 59, 204, 43, 49, 236, 239, 230, 121, 230, 64, 10, 13, 43, 182, 41, 224, 170, 90, 192, 206, 115, 212, 110, 173, 9, 143, 78, 198, 142, 127, 147, 14, 119, 129, 222, 80, 2, 234, 219, 16, 85, 107, 107, 33, 58, 52, 129, 178, 63, 245, 103, 85, 75, 242, 57, 161, 22, 186, 71, 140, 154, 224, 83, 157, 56, 26, 236, 92, 193, 239, 92, 252, 50, 159, 47, 221, 7, 68, 150, 121, 201, 31, 87, 217, 216, 159, 97, 55, 184, 193, 116, 48, 126, 214, 95, 199, 171, 117, 223, 201, 228, 248, 185, 146, 249, 45 }, "M", "Admin", "admin" });
+                values: new object[] { "0000000000000", "admin@admin.com", "Admin", new byte[] { 122, 227, 76, 227, 3, 184, 68, 103, 145, 236, 123, 162, 65, 133, 41, 181, 60, 209, 66, 196, 105, 99, 181, 12, 49, 239, 183, 65, 4, 185, 60, 100, 180, 167, 89, 147, 4, 180, 29, 154, 42, 113, 80, 220, 244, 196, 176, 159, 230, 114, 111, 251, 139, 186, 147, 47, 51, 98, 248, 99, 178, 113, 33, 131 }, new byte[] { 94, 172, 170, 184, 5, 226, 251, 246, 19, 110, 75, 248, 116, 93, 165, 197, 235, 134, 214, 100, 241, 7, 202, 197, 50, 178, 45, 196, 195, 83, 184, 218, 73, 172, 75, 205, 29, 45, 0, 218, 128, 143, 83, 167, 164, 54, 155, 17, 105, 234, 216, 123, 34, 127, 95, 132, 53, 32, 90, 153, 35, 236, 183, 94, 45, 117, 145, 252, 50, 59, 18, 215, 182, 42, 117, 51, 74, 5, 62, 128, 1, 195, 11, 181, 103, 123, 5, 169, 38, 71, 136, 151, 173, 187, 133, 169, 141, 219, 119, 42, 121, 14, 88, 249, 56, 115, 15, 218, 25, 19, 4, 214, 170, 174, 224, 103, 148, 45, 169, 182, 150, 149, 97, 13, 140, 176, 143, 233 }, "M", "Admin", "admin" });
 
             migrationBuilder.InsertData(
                 table: "Smerovi",
@@ -395,14 +393,14 @@ namespace MoodleCloneAPI.Migrations
                 value: "0000000000000");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Kursevi_AsistentOsobaJMBG",
+                name: "IX_Kursevi_AsistentJMBG",
                 table: "Kursevi",
-                column: "AsistentOsobaJMBG");
+                column: "AsistentJMBG");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Kursevi_ProfesorOsobaJMBG",
+                name: "IX_Kursevi_ProfesorJMBG",
                 table: "Kursevi",
-                column: "ProfesorOsobaJMBG");
+                column: "ProfesorJMBG");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Kursevi_SmerId",

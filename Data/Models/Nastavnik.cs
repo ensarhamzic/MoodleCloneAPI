@@ -21,5 +21,7 @@ namespace MoodleCloneAPI.Data.Models
         [Required]
         public Tip Tip { get; set; }
         public bool Verifikovan { get; set; }
+        public ICollection<Kurs> Kursevi { get; set; }
+        public ICollection<Kurs> KurseviAsistent { get; set; }
     }
 }

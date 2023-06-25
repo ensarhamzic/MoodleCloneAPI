@@ -15,11 +15,11 @@ namespace MoodleCloneAPI.Data.Models
         [Required]
         public Smer Smer { get; set; }
         [Required]
-        public int ProfesorJMBG { get; set; }
+        public string ProfesorJMBG { get; set; }
         [Required]
         public Nastavnik Profesor { get; set; }
         [Required]
-        public int AsistentJMBG { get; set; }
+        public string AsistentJMBG { get; set; }
         [Required]
         public Nastavnik Asistent { get; set; }
 

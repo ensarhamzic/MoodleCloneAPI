@@ -42,6 +42,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<SmeroviService>();
 builder.Services.AddScoped<ZvanjeService>();
 builder.Services.AddScoped<TipService>();
+builder.Services.AddScoped<KursService>();
 
 builder.Services.AddHttpContextAccessor();
 
