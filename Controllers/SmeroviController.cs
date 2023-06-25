@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using MoodleCloneAPI.Data.Services;
 using MoodleCloneAPI.Data.ViewModels.Requests;
 
@@ -31,12 +32,35 @@ namespace MoodleCloneAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("index-exists/{indeks}")]
+        public IActionResult IndexExists(string indeks)
+        {
+            try
+            {
+                var result = smeroviService.IndexExists(indeks);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+
+        }
+
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public IActionResult DodajStudentaNaSmer(StudentSmerVM request)
         {
-            var result = smeroviService.DodajStudentaNaSmer(request);
-            return Ok(result);
+            try
+            {
+                var result = smeroviService.DodajStudentaNaSmer(request);
+                return Ok(new { message = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            
         }
     }
 }

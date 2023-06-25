@@ -294,5 +294,10 @@ namespace MoodleCloneAPI.Data.Services
             dbContext.SaveChanges();
             return "Teacher deleted successfully!";
         }
+
+        public Student GetStudent(string jmbg)
+        {
+            return dbContext.Studenti.Include(s => s.Osoba).Include(s => s.Smerovi).ThenInclude(s => s.Smer).FirstOrDefault(s => s.OsobaJMBG == jmbg) ?? throw new Exception("Student not found!");
+        }
     }
 }

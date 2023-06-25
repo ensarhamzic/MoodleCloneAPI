@@ -240,8 +240,8 @@ namespace MoodleCloneAPI.Migrations
                             JMBG = "0000000000000",
                             Email = "admin@admin.com",
                             Ime = "Admin",
-                            PasswordHash = new byte[] { 207, 221, 205, 80, 209, 198, 200, 38, 5, 103, 111, 109, 184, 159, 91, 197, 200, 172, 215, 37, 170, 65, 155, 121, 49, 80, 0, 48, 207, 132, 146, 85, 3, 30, 17, 32, 156, 157, 69, 81, 69, 137, 153, 122, 9, 238, 128, 207, 104, 221, 173, 183, 46, 186, 97, 155, 19, 126, 175, 124, 220, 234, 218, 123 },
-                            PasswordSalt = new byte[] { 31, 103, 102, 206, 180, 71, 41, 161, 164, 23, 89, 200, 72, 147, 146, 248, 125, 188, 57, 128, 86, 128, 172, 202, 59, 132, 123, 45, 52, 120, 142, 113, 45, 199, 2, 71, 74, 65, 218, 201, 107, 110, 158, 109, 210, 44, 63, 60, 183, 55, 39, 106, 93, 100, 176, 121, 155, 113, 227, 162, 64, 234, 176, 187, 203, 92, 184, 196, 110, 250, 82, 96, 156, 167, 224, 245, 85, 142, 90, 76, 21, 191, 75, 168, 78, 53, 31, 53, 105, 148, 82, 22, 46, 58, 45, 91, 7, 164, 169, 75, 247, 67, 60, 156, 197, 56, 101, 81, 219, 230, 57, 55, 78, 171, 48, 228, 72, 240, 152, 125, 149, 206, 73, 86, 190, 72, 133, 137 },
+                            PasswordHash = new byte[] { 91, 19, 155, 199, 17, 91, 126, 131, 147, 142, 248, 116, 88, 11, 64, 99, 33, 219, 144, 65, 221, 184, 235, 152, 175, 104, 144, 49, 120, 47, 92, 125, 164, 62, 247, 214, 2, 236, 24, 237, 130, 158, 175, 212, 172, 253, 222, 254, 13, 198, 108, 58, 204, 104, 6, 137, 150, 100, 188, 72, 80, 147, 155, 76 },
+                            PasswordSalt = new byte[] { 173, 250, 158, 178, 12, 24, 214, 32, 94, 38, 183, 49, 142, 56, 26, 155, 100, 199, 163, 26, 204, 86, 59, 204, 43, 49, 236, 239, 230, 121, 230, 64, 10, 13, 43, 182, 41, 224, 170, 90, 192, 206, 115, 212, 110, 173, 9, 143, 78, 198, 142, 127, 147, 14, 119, 129, 222, 80, 2, 234, 219, 16, 85, 107, 107, 33, 58, 52, 129, 178, 63, 245, 103, 85, 75, 242, 57, 161, 22, 186, 71, 140, 154, 224, 83, 157, 56, 26, 236, 92, 193, 239, 92, 252, 50, 159, 47, 221, 7, 68, 150, 121, 201, 31, 87, 217, 216, 159, 97, 55, 184, 193, 116, 48, 126, 214, 95, 199, 171, 117, 223, 201, 228, 248, 185, 146, 249, 45 },
                             Pol = "M",
                             Prezime = "Admin",
                             Username = "admin"
@@ -287,6 +287,33 @@ namespace MoodleCloneAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Smerovi");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Naziv = "Softversko inzenjerstvo"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Naziv = "Racunarska tehnika"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Naziv = "Matematika"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Naziv = "Ekonomija"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Naziv = "Pravo"
+                        });
                 });
 
             modelBuilder.Entity("MoodleCloneAPI.Data.Models.Student", b =>
@@ -357,8 +384,8 @@ namespace MoodleCloneAPI.Migrations
 
             modelBuilder.Entity("MoodleCloneAPI.Data.Models.StudentSmer", b =>
                 {
-                    b.Property<int>("StudentJMBG")
-                        .HasColumnType("int");
+                    b.Property<string>("StudentJMBG")
+                        .HasColumnType("nvarchar(13)");
 
                     b.Property<int>("SmerId")
                         .HasColumnType("int");
@@ -367,15 +394,9 @@ namespace MoodleCloneAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StudentOsobaJMBG")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(13)");
-
                     b.HasKey("StudentJMBG", "SmerId");
 
                     b.HasIndex("SmerId");
-
-                    b.HasIndex("StudentOsobaJMBG");
 
                     b.ToTable("StudentiSmerovi");
                 });
@@ -639,7 +660,7 @@ namespace MoodleCloneAPI.Migrations
 
                     b.HasOne("MoodleCloneAPI.Data.Models.Student", "Student")
                         .WithMany("Smerovi")
-                        .HasForeignKey("StudentOsobaJMBG")
+                        .HasForeignKey("StudentJMBG")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

@@ -188,5 +188,19 @@ namespace MoodleCloneAPI.Controllers
             }
         }
 
+        [HttpGet("students/{jmbg}")]
+        public IActionResult GetStudent(string jmbg)
+        {
+            try
+            {
+                var response = userService.GetStudent(jmbg);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }

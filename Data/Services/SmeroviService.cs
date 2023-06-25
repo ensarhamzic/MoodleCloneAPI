@@ -24,6 +24,16 @@ namespace MoodleCloneAPI.Data.Services
             return dbContext.Smerovi.Find(id);
         }
 
+        public bool IndexExists(string brojIndeksa)
+        {
+            var studentSmer = dbContext.StudentiSmerovi
+                .Where(ss => ss.BrojIndeksa == brojIndeksa)
+                .FirstOrDefault();
+            if (studentSmer != null)
+                return true;
+            return false;
+        }
+
         public string DodajStudentaNaSmer(StudentSmerVM request)
         {
             var student = dbContext.Studenti.Find(request.StudentJMBG);
@@ -35,6 +45,11 @@ namespace MoodleCloneAPI.Data.Services
                 .FirstOrDefault();
             if (studentSmer != null)
                 throw new Exception("Student je vec na tom smeru");
+            var imaIndeks = dbContext.StudentiSmerovi
+                .Where(ss => ss.BrojIndeksa == request.BrojIndeksa)
+                .FirstOrDefault();
+            if (imaIndeks != null)
+                throw new Exception("Student sa tim brojem indeksa vec postoji");
             var newStudentSmer = new StudentSmer()
             {
                 StudentJMBG = request.StudentJMBG,

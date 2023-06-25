@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MoodleCloneAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -74,8 +74,7 @@ namespace MoodleCloneAPI.Migrations
                 name: "Administratori",
                 columns: table => new
                 {
-                    OsobaJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false),
-                    Superadmin = table.Column<bool>(type: "bit", nullable: false)
+                    OsobaJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -332,9 +331,8 @@ namespace MoodleCloneAPI.Migrations
                 name: "StudentiSmerovi",
                 columns: table => new
                 {
-                    StudentJMBG = table.Column<int>(type: "int", nullable: false),
+                    StudentJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false),
                     SmerId = table.Column<int>(type: "int", nullable: false),
-                    StudentOsobaJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false),
                     BrojIndeksa = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -347,11 +345,28 @@ namespace MoodleCloneAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_StudentiSmerovi_Studenti_StudentOsobaJMBG",
-                        column: x => x.StudentOsobaJMBG,
+                        name: "FK_StudentiSmerovi_Studenti_StudentJMBG",
+                        column: x => x.StudentJMBG,
                         principalTable: "Studenti",
                         principalColumn: "OsobaJMBG",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Osobe",
+                columns: new[] { "JMBG", "Email", "Ime", "PasswordHash", "PasswordSalt", "Pol", "Prezime", "Username" },
+                values: new object[] { "0000000000000", "admin@admin.com", "Admin", new byte[] { 91, 19, 155, 199, 17, 91, 126, 131, 147, 142, 248, 116, 88, 11, 64, 99, 33, 219, 144, 65, 221, 184, 235, 152, 175, 104, 144, 49, 120, 47, 92, 125, 164, 62, 247, 214, 2, 236, 24, 237, 130, 158, 175, 212, 172, 253, 222, 254, 13, 198, 108, 58, 204, 104, 6, 137, 150, 100, 188, 72, 80, 147, 155, 76 }, new byte[] { 173, 250, 158, 178, 12, 24, 214, 32, 94, 38, 183, 49, 142, 56, 26, 155, 100, 199, 163, 26, 204, 86, 59, 204, 43, 49, 236, 239, 230, 121, 230, 64, 10, 13, 43, 182, 41, 224, 170, 90, 192, 206, 115, 212, 110, 173, 9, 143, 78, 198, 142, 127, 147, 14, 119, 129, 222, 80, 2, 234, 219, 16, 85, 107, 107, 33, 58, 52, 129, 178, 63, 245, 103, 85, 75, 242, 57, 161, 22, 186, 71, 140, 154, 224, 83, 157, 56, 26, 236, 92, 193, 239, 92, 252, 50, 159, 47, 221, 7, 68, 150, 121, 201, 31, 87, 217, 216, 159, 97, 55, 184, 193, 116, 48, 126, 214, 95, 199, 171, 117, 223, 201, 228, 248, 185, 146, 249, 45 }, "M", "Admin", "admin" });
+
+            migrationBuilder.InsertData(
+                table: "Smerovi",
+                columns: new[] { "Id", "Naziv" },
+                values: new object[,]
+                {
+                    { 1, "Softversko inzenjerstvo" },
+                    { 2, "Racunarska tehnika" },
+                    { 3, "Matematika" },
+                    { 4, "Ekonomija" },
+                    { 5, "Pravo" }
                 });
 
             migrationBuilder.InsertData(
@@ -373,6 +388,11 @@ namespace MoodleCloneAPI.Migrations
                     { 3, "Docent" },
                     { 5, "Saradnik u nastavi" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Administratori",
+                column: "OsobaJMBG",
+                value: "0000000000000");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Kursevi_AsistentOsobaJMBG",
@@ -475,11 +495,6 @@ namespace MoodleCloneAPI.Migrations
                 name: "IX_StudentiSmerovi_SmerId",
                 table: "StudentiSmerovi",
                 column: "SmerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StudentiSmerovi_StudentOsobaJMBG",
-                table: "StudentiSmerovi",
-                column: "StudentOsobaJMBG");
         }
 
         /// <inheritdoc />

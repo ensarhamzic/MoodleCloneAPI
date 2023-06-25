@@ -34,6 +34,8 @@ namespace MoodleCloneAPI.Data
             modelBuilder.Entity<StudentSmer>().HasKey(ss => new { ss.StudentJMBG, ss.SmerId });
             modelBuilder.Entity<PrijavaKurs>().HasKey(pk => new { pk.StudentJMBG, pk.KursId });
 
+            modelBuilder.Entity<StudentSmer>().HasOne(ss => ss.Student).WithMany(s => s.Smerovi).HasForeignKey(ss => ss.StudentJMBG);
+
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
@@ -70,6 +72,34 @@ namespace MoodleCloneAPI.Data
                 {
                     OsobaJMBG = "0000000000000"
                 });
+
+            modelBuilder.Entity<Smer>().HasData(
+                new Smer()
+                {
+                    Id = 1,
+                    Naziv = "Softversko inzenjerstvo"
+                },
+                new Smer()
+                {
+                    Id = 2,
+                    Naziv = "Racunarska tehnika",
+                },
+                new Smer()
+                {
+                    Id = 3,
+                    Naziv = "Matematika",
+                },
+                new Smer()
+                {
+                    Id = 4,
+                    Naziv = "Ekonomija",
+                },
+                new Smer()
+                {
+                    Id = 5,
+                    Naziv = "Pravo",
+                }
+                );
         }
 
         public DbSet<Osoba> Osobe { get; set; }
