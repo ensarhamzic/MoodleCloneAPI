@@ -141,7 +141,8 @@ namespace MoodleCloneAPI.Data.Services
             {
                 var profesorId = dbContext.Tipovi.FirstOrDefault(t => t.Naziv == "Profesor").Id;
                 role = profesorId == teacher.TipId ? "Profesor" : "Asistent";
-                verified = teacher.Verifikovan;
+                if(!teacher.Verifikovan)
+                    throw new Exception("Wait for admin to verify your account!");
             }
             else if (student != null)
                 role = "Student";
@@ -221,7 +222,7 @@ namespace MoodleCloneAPI.Data.Services
             return dbContext.Osobe.Find(id);
         }
 
-        private void SendEmail(string recipientEmail, string emailSubject, string emailText)
+        public void SendEmail(string recipientEmail, string emailSubject, string emailText)
         {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(configuration.GetSection("Mail:From").Value));

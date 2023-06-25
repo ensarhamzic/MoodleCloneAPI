@@ -33,6 +33,7 @@ namespace MoodleCloneAPI.Data
             modelBuilder.Entity<StudentObavestenje>().HasKey(so => new { so.StudentJMBG, so.ObavestenjeId });
             modelBuilder.Entity<StudentSmer>().HasKey(ss => new { ss.StudentJMBG, ss.SmerId });
             modelBuilder.Entity<PrijavaKurs>().HasKey(pk => new { pk.StudentJMBG, pk.KursId });
+            modelBuilder.Entity<PrijavaKurs>().HasOne(pk => pk.Student).WithMany(s => s.PrijavljeniKursevi).HasForeignKey(pk => pk.StudentJMBG);
 
             modelBuilder.Entity<Kurs>().HasOne(k => k.Smer).WithMany(s => s.Kursevi).HasForeignKey(k => k.SmerId);
             modelBuilder.Entity<Kurs>().HasOne(k => k.Profesor).WithMany(n => n.Kursevi).HasForeignKey(k => k.ProfesorJMBG);

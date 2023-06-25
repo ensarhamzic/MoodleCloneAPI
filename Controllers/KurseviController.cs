@@ -60,5 +60,20 @@ namespace MoodleCloneAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost("{id}/prijava")]
+        [Authorize(Roles = "Student")]
+        public IActionResult Apply(int id)
+        {
+            try
+            {
+                var response = kursService.PrijaviSeNaKurs(id);
+                return Ok(new {message = response});
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
