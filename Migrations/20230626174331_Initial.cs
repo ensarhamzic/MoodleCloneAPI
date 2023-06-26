@@ -164,6 +164,7 @@ namespace MoodleCloneAPI.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Naziv = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Sadrzaj = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PublicId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Tip = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Datum = table.Column<DateTime>(type: "datetime2", nullable: false),
                     NastavnikJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false),
@@ -276,9 +277,8 @@ namespace MoodleCloneAPI.Migrations
                 name: "StudentiMaterijali",
                 columns: table => new
                 {
-                    StudentJMBG = table.Column<int>(type: "int", nullable: false),
-                    MaterijalId = table.Column<int>(type: "int", nullable: false),
-                    StudentOsobaJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false)
+                    StudentJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false),
+                    MaterijalId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -290,8 +290,8 @@ namespace MoodleCloneAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_StudentiMaterijali_Studenti_StudentOsobaJMBG",
-                        column: x => x.StudentOsobaJMBG,
+                        name: "FK_StudentiMaterijali_Studenti_StudentJMBG",
+                        column: x => x.StudentJMBG,
                         principalTable: "Studenti",
                         principalColumn: "OsobaJMBG",
                         onDelete: ReferentialAction.Restrict);
@@ -301,9 +301,9 @@ namespace MoodleCloneAPI.Migrations
                 name: "StudentiObavestenja",
                 columns: table => new
                 {
-                    StudentJMBG = table.Column<int>(type: "int", nullable: false),
+                    StudentJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false),
                     ObavestenjeId = table.Column<int>(type: "int", nullable: false),
-                    StudentOsobaJMBG = table.Column<string>(type: "nvarchar(13)", nullable: false)
+                    Datum = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -315,8 +315,8 @@ namespace MoodleCloneAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_StudentiObavestenja_Studenti_StudentOsobaJMBG",
-                        column: x => x.StudentOsobaJMBG,
+                        name: "FK_StudentiObavestenja_Studenti_StudentJMBG",
+                        column: x => x.StudentJMBG,
                         principalTable: "Studenti",
                         principalColumn: "OsobaJMBG",
                         onDelete: ReferentialAction.Restrict);
@@ -350,7 +350,7 @@ namespace MoodleCloneAPI.Migrations
             migrationBuilder.InsertData(
                 table: "Osobe",
                 columns: new[] { "JMBG", "Email", "Ime", "PasswordHash", "PasswordSalt", "Pol", "Prezime", "Username" },
-                values: new object[] { "0000000000000", "admin@admin.com", "Admin", new byte[] { 177, 113, 245, 25, 191, 56, 197, 90, 95, 14, 131, 148, 18, 111, 183, 115, 40, 31, 147, 46, 77, 211, 57, 111, 162, 233, 45, 126, 194, 129, 179, 36, 37, 47, 172, 31, 149, 166, 84, 199, 0, 217, 18, 65, 168, 130, 117, 94, 81, 34, 1, 125, 223, 198, 205, 240, 77, 62, 43, 234, 242, 100, 175, 29 }, new byte[] { 97, 22, 231, 20, 217, 41, 178, 156, 39, 217, 8, 55, 79, 111, 84, 26, 233, 254, 152, 184, 56, 227, 233, 188, 136, 190, 128, 32, 49, 226, 226, 114, 17, 203, 247, 230, 197, 134, 105, 146, 48, 44, 227, 77, 174, 226, 117, 208, 139, 217, 101, 176, 87, 252, 101, 209, 42, 181, 46, 29, 223, 191, 237, 202, 74, 131, 212, 0, 153, 178, 88, 3, 129, 194, 164, 41, 50, 119, 177, 40, 136, 160, 42, 238, 252, 7, 237, 59, 34, 226, 199, 88, 130, 251, 131, 53, 8, 52, 127, 30, 150, 192, 241, 18, 28, 229, 227, 243, 118, 255, 157, 146, 31, 55, 252, 142, 47, 108, 131, 191, 26, 92, 145, 136, 61, 236, 39, 114 }, "M", "Admin", "admin" });
+                values: new object[] { "0000000000000", "admin@admin.com", "Admin", new byte[] { 6, 66, 0, 3, 75, 58, 94, 155, 135, 216, 139, 126, 5, 165, 98, 42, 234, 89, 131, 121, 42, 209, 163, 30, 31, 97, 128, 169, 60, 235, 11, 125, 154, 98, 73, 83, 79, 240, 137, 28, 62, 244, 51, 109, 181, 69, 143, 164, 249, 83, 170, 203, 13, 89, 31, 79, 146, 255, 218, 137, 214, 15, 205, 158 }, new byte[] { 104, 75, 233, 219, 249, 85, 125, 126, 21, 251, 235, 172, 187, 27, 209, 72, 43, 20, 225, 24, 29, 144, 82, 164, 72, 4, 173, 69, 138, 39, 27, 78, 180, 98, 87, 79, 217, 87, 1, 187, 255, 13, 37, 110, 241, 48, 220, 43, 160, 153, 235, 105, 197, 200, 146, 15, 54, 174, 153, 156, 232, 60, 46, 64, 197, 137, 3, 176, 136, 176, 177, 134, 34, 54, 23, 5, 16, 12, 197, 47, 6, 5, 95, 38, 24, 160, 44, 66, 246, 24, 40, 84, 59, 33, 110, 92, 203, 218, 191, 10, 2, 158, 245, 154, 199, 185, 29, 162, 80, 180, 116, 209, 154, 105, 27, 44, 110, 167, 168, 207, 231, 150, 48, 173, 32, 130, 116, 134 }, "M", "Admin", "admin" });
 
             migrationBuilder.InsertData(
                 table: "Smerovi",
@@ -467,19 +467,9 @@ namespace MoodleCloneAPI.Migrations
                 column: "MaterijalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StudentiMaterijali_StudentOsobaJMBG",
-                table: "StudentiMaterijali",
-                column: "StudentOsobaJMBG");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_StudentiObavestenja_ObavestenjeId",
                 table: "StudentiObavestenja",
                 column: "ObavestenjeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StudentiObavestenja_StudentOsobaJMBG",
-                table: "StudentiObavestenja",
-                column: "StudentOsobaJMBG");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentiSmerovi_SmerId",

@@ -10,9 +10,9 @@ namespace MoodleCloneAPI.Data.Models
         public Osoba Osoba { get; set; }
         [Required]
         public string Adresa { get; set; }
-        public ICollection<StudentMaterijal> PregledaniMaterijali { get; set; }
+        public ICollection<StudentMaterijal> Materijali { get; set; }
         public ICollection<PrijavaKurs> PrijavljeniKursevi { get; set; }
         public ICollection<StudentSmer> Smerovi { get; set; }
-        public ICollection<StudentObavestenje> PregledanaObavestenja { get; set; }
+        public ICollection<StudentObavestenje> Obavestenja { get; set; }
     }
 }

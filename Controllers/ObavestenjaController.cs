@@ -25,6 +25,7 @@ namespace MoodleCloneAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult GetObavestenje(int id)
         {
             var result = obavestenjesService.GetObavestenje(id);
