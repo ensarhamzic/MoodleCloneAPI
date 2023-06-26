@@ -46,6 +46,36 @@ namespace MoodleCloneAPI.Controllers
             }
         }
 
+        [HttpGet("{id}/prijave")]
+        [Authorize(Roles = "Profesor,Asistent")]
+        public IActionResult GetApplications(int id)
+        {
+            try
+            {
+                var response = kursService.GetPrijaveNaKurs(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("{id}/prijave")]
+        [Authorize(Roles = "Profesor,Asistent")]
+        public IActionResult OdgovoriNaPrijavu(int id, [FromBody] OdgovorPrijavaVM request)
+        {
+            try
+            {
+                var response = kursService.OdgovoriNaPrijavu(request, id);
+                return Ok(new {message = response});
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "Profesor")]
         public IActionResult Create([FromBody] KursVM request)
@@ -69,6 +99,21 @@ namespace MoodleCloneAPI.Controllers
             {
                 var response = kursService.PrijaviSeNaKurs(id);
                 return Ok(new {message = response});
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("{id}/materijali")]
+        [Authorize(Roles = "Profesor,Asistent")]
+        public IActionResult DodajMaterijal(int id, [FromForm] MaterijalVM request)
+        {
+            try
+            {
+                var response = kursService.DodajMaterijal(request, id);
+                return Ok(response);
             }
             catch (Exception ex)
             {

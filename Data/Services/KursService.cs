@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using MoodleCloneAPI.Data.Models;
 using MoodleCloneAPI.Data.ViewModels.Requests;
@@ -10,11 +14,20 @@ namespace MoodleCloneAPI.Data.Services
     {
         private readonly AppDbContext dbContext;
         private readonly UserService userService;
+        private readonly IConfiguration configuration;
+        private Account account;
+        private Cloudinary cloudinary;
 
-        public KursService(AppDbContext dbContext, UserService userService)
+        public KursService(AppDbContext dbContext, UserService userService, IConfiguration configuration)
         {
             this.dbContext = dbContext;
             this.userService = userService;
+            this.configuration = configuration;
+            account = new Account(
+               configuration.GetSection("Cloudinary:Cloud").Value,
+               configuration.GetSection("Cloudinary:ApiKey").Value,
+               configuration.GetSection("Cloudinary:ApiSecret").Value);
+            cloudinary = new Cloudinary(account);
         }
 
         public Kurs CreateCourse(KursVM request)
@@ -43,10 +56,15 @@ namespace MoodleCloneAPI.Data.Services
             if(userJMBG == null)
                 kurs.Materijali = null;
 
+            int? brojPrijava = null;
             var canManage = false;
             var pending = false;
             if (kurs.AsistentJMBG == userJMBG || kurs.ProfesorJMBG == userJMBG)
+            {
                 canManage = true;
+                brojPrijava = dbContext.PrijaveKurseva.Where(p => p.KursId == kurs.Id && p.NaCekanju).Count();
+            }
+                
             
             var student = dbContext.Studenti.FirstOrDefault(s => s.OsobaJMBG == userJMBG);
             if (student != null)
@@ -59,14 +77,32 @@ namespace MoodleCloneAPI.Data.Services
                     kurs.Materijali = null;
                     pending = true;
                 }
-                    
             }
             return new KursResponseVM()
             {
                 Kurs = kurs,
                 CanManage = canManage,
-                Pending = pending
+                Pending = pending,
+                BrojPrijava = brojPrijava
             };
+        }
+
+        public List<Student> GetPrijaveNaKurs(int kursId)
+        {
+            var kurs = dbContext.Kursevi
+                .Include(k => k.Asistent)
+                .Include(k => k.Profesor)
+                .Include(k => k.Materijali)
+                .Include(k => k.Smer)
+                .FirstOrDefault(k => k.Id == kursId)
+                ?? throw new Exception("Kurs nije pronadjen");
+
+            var userJMBG = userService.GetAuthUserId();
+            if (kurs.AsistentJMBG != userJMBG && kurs.ProfesorJMBG != userJMBG)
+                throw new Exception("Nemate pristup ovom kursu");
+
+            var prijave = dbContext.PrijaveKurseva.Where(p => p.KursId == kursId && p.NaCekanju).Include(p => p.Student).ThenInclude(s => s.Osoba).ToList();
+            return prijave.Select(p => p.Student).ToList();
         }
 
         public List<Kurs> GetTeacherCourses()
@@ -110,5 +146,75 @@ namespace MoodleCloneAPI.Data.Services
             
             return "Uspesno";
         }
+
+        public string OdgovoriNaPrijavu(OdgovorPrijavaVM request, int kursId)
+        {
+            var userJMBG = userService.GetAuthUserId();
+            var course = dbContext.Kursevi.FirstOrDefault(k => k.Id == kursId) ?? throw new Exception("Kurs nije pronadjen");
+            var student = dbContext.Studenti.Include(s => s.Osoba).FirstOrDefault(s => s.OsobaJMBG == request.StudentJMBG) ?? throw new Exception("Student nije pronadjen");
+            var studentCourse = dbContext.PrijaveKurseva.FirstOrDefault(sk => sk.StudentJMBG == student.OsobaJMBG && sk.KursId == course.Id) ?? throw new Exception("Student nije prijavljen na kurs");
+            if (studentCourse.NaCekanju == false)
+                throw new Exception("Student je vec prihvacen");
+
+            if(request.Prihvacena)
+                studentCourse.NaCekanju = false;
+            else
+                dbContext.PrijaveKurseva.Remove(studentCourse);
+     
+            dbContext.SaveChanges();
+
+            var emailSubject = $"Odgovor na prijavu na kurs {course.Naziv}";
+            var emailBody = $"Vasa prijava na kurs {course.Naziv} je ";
+            if (request.Prihvacena)
+                emailBody += "prihvacena";
+            else
+                emailBody += "odbijena";
+            userService.SendEmail(student.Osoba.Email, emailSubject, emailBody);
+            return "Uspesno";
+        }
+
+        public Materijal DodajMaterijal(MaterijalVM request, int id)
+        {
+            var userJMBG = userService.GetAuthUserId();
+            var course = dbContext.Kursevi.FirstOrDefault(k => k.Id == id) ?? throw new Exception("Kurs nije pronadjen");
+            if (course.ProfesorJMBG != userJMBG && course.AsistentJMBG != userJMBG)
+                throw new Exception("Nemate pristup ovom kursu");
+
+            var tip = "Predavanja";
+            if (course.AsistentJMBG == userJMBG)
+                tip = "Vezbe";
+
+            var fileName = Path.GetFileNameWithoutExtension(request.File.FileName);
+            var fileExtension = Path.GetExtension(request.File.FileName);
+            var tempPath = Path.Combine(Path.GetTempPath(), $"{fileName}{fileExtension}");
+            using (var stream = new FileStream(tempPath, FileMode.Create))
+            {
+                request.File.CopyTo(stream);
+            }
+            var guid = Guid.NewGuid().ToString();
+            var filePublicId = $"{configuration.GetSection("Cloudinary:FolderName").Value}/{guid}{fileExtension}";
+            var uploadParams = new RawUploadParams()
+            {
+                File = new FileDescription(tempPath),
+                PublicId = filePublicId,
+            };
+            var uploadResult = cloudinary.Upload(uploadParams);
+
+            var materijal = new Materijal()
+            {
+                Naziv = request.Naziv,
+                Sadrzaj = uploadResult.Uri.ToString(),
+                KursId = id,
+                Tip = tip,
+                NastavnikJMBG = userJMBG,
+                Datum = DateTime.Now
+            };
+
+            dbContext.Materijali.Add(materijal);
+            dbContext.SaveChanges();
+
+            return materijal;
+        }
     }
 }
+    

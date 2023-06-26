@@ -7,5 +7,6 @@ namespace MoodleCloneAPI.Data.ViewModels.Responses
         public Kurs Kurs { get; set; }
         public bool CanManage { get; set; }
         public bool Pending { get; set; }
+        public int? BrojPrijava { get; set; }
     }
 }

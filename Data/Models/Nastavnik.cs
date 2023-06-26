@@ -24,5 +24,6 @@ namespace MoodleCloneAPI.Data.Models
         public ICollection<Kurs> Kursevi { get; set; }
         public ICollection<Kurs> KurseviAsistent { get; set; }
         public ICollection<Obavestenje> Obavestenja { get; set; }
+        public ICollection<Materijal> Materijali { get; set; }
     }
 }

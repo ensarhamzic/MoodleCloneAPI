@@ -15,7 +15,7 @@ namespace MoodleCloneAPI.Data.Models
         [Required]
         public DateTime Datum { get; set; }
         [Required]
-        public int NastavnikJMBG { get; set; }
+        public string NastavnikJMBG { get; set; }
         [Required]
         public Nastavnik Nastavnik { get; set; }
         [Required]

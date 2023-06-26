@@ -12,7 +12,7 @@ using MoodleCloneAPI.Data;
 namespace MoodleCloneAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230625202822_Initial")]
+    [Migration("20230626111352_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -92,10 +92,7 @@ namespace MoodleCloneAPI.Migrations
                     b.Property<int>("KursId")
                         .HasColumnType("int");
 
-                    b.Property<int>("NastavnikJMBG")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NastavnikOsobaJMBG")
+                    b.Property<string>("NastavnikJMBG")
                         .IsRequired()
                         .HasColumnType("nvarchar(13)");
 
@@ -115,7 +112,7 @@ namespace MoodleCloneAPI.Migrations
 
                     b.HasIndex("KursId");
 
-                    b.HasIndex("NastavnikOsobaJMBG");
+                    b.HasIndex("NastavnikJMBG");
 
                     b.ToTable("Materijali");
                 });
@@ -234,8 +231,8 @@ namespace MoodleCloneAPI.Migrations
                             JMBG = "0000000000000",
                             Email = "admin@admin.com",
                             Ime = "Admin",
-                            PasswordHash = new byte[] { 38, 172, 55, 118, 2, 88, 111, 106, 126, 89, 224, 119, 99, 239, 54, 99, 34, 94, 57, 69, 249, 93, 124, 40, 90, 160, 189, 202, 218, 1, 221, 165, 143, 109, 22, 25, 114, 124, 43, 224, 128, 182, 61, 26, 42, 71, 1, 159, 100, 129, 75, 99, 55, 119, 227, 143, 189, 41, 41, 86, 21, 122, 142, 56 },
-                            PasswordSalt = new byte[] { 70, 48, 97, 91, 105, 107, 186, 223, 45, 176, 220, 14, 74, 213, 27, 168, 69, 175, 254, 58, 100, 248, 167, 214, 198, 56, 10, 125, 72, 4, 83, 30, 88, 206, 37, 50, 194, 153, 232, 50, 33, 237, 226, 74, 213, 249, 179, 112, 129, 89, 193, 169, 187, 133, 93, 58, 244, 61, 108, 216, 46, 56, 93, 103, 123, 162, 42, 239, 186, 178, 83, 33, 215, 80, 114, 1, 215, 102, 60, 22, 196, 136, 144, 12, 56, 95, 122, 177, 111, 175, 32, 205, 249, 202, 141, 238, 109, 3, 113, 15, 114, 68, 96, 9, 187, 131, 68, 26, 118, 198, 231, 141, 131, 99, 123, 206, 173, 144, 59, 54, 107, 44, 160, 19, 186, 251, 7, 230 },
+                            PasswordHash = new byte[] { 177, 113, 245, 25, 191, 56, 197, 90, 95, 14, 131, 148, 18, 111, 183, 115, 40, 31, 147, 46, 77, 211, 57, 111, 162, 233, 45, 126, 194, 129, 179, 36, 37, 47, 172, 31, 149, 166, 84, 199, 0, 217, 18, 65, 168, 130, 117, 94, 81, 34, 1, 125, 223, 198, 205, 240, 77, 62, 43, 234, 242, 100, 175, 29 },
+                            PasswordSalt = new byte[] { 97, 22, 231, 20, 217, 41, 178, 156, 39, 217, 8, 55, 79, 111, 84, 26, 233, 254, 152, 184, 56, 227, 233, 188, 136, 190, 128, 32, 49, 226, 226, 114, 17, 203, 247, 230, 197, 134, 105, 146, 48, 44, 227, 77, 174, 226, 117, 208, 139, 217, 101, 176, 87, 252, 101, 209, 42, 181, 46, 29, 223, 191, 237, 202, 74, 131, 212, 0, 153, 178, 88, 3, 129, 194, 164, 41, 50, 119, 177, 40, 136, 160, 42, 238, 252, 7, 237, 59, 34, 226, 199, 88, 130, 251, 131, 53, 8, 52, 127, 30, 150, 192, 241, 18, 28, 229, 227, 243, 118, 255, 157, 146, 31, 55, 252, 142, 47, 108, 131, 191, 26, 92, 145, 136, 61, 236, 39, 114 },
                             Pol = "M",
                             Prezime = "Admin",
                             Username = "admin"
@@ -504,8 +501,8 @@ namespace MoodleCloneAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("MoodleCloneAPI.Data.Models.Nastavnik", "Nastavnik")
-                        .WithMany()
-                        .HasForeignKey("NastavnikOsobaJMBG")
+                        .WithMany("Materijali")
+                        .HasForeignKey("NastavnikJMBG")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -678,6 +675,8 @@ namespace MoodleCloneAPI.Migrations
                     b.Navigation("Kursevi");
 
                     b.Navigation("KurseviAsistent");
+
+                    b.Navigation("Materijali");
 
                     b.Navigation("Obavestenja");
                 });
