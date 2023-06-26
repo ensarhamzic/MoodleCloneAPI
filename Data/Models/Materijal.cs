@@ -10,6 +10,7 @@ namespace MoodleCloneAPI.Data.Models
         public string Naziv { get; set; }
         [Required]
         public string Sadrzaj { get; set; }
+        public string PublicId { get; set; }
         [Required]
         public string Tip { get; set; }
         [Required]

@@ -204,6 +204,7 @@ namespace MoodleCloneAPI.Data.Services
             {
                 Naziv = request.Naziv,
                 Sadrzaj = uploadResult.Uri.ToString(),
+                PublicId = uploadResult.PublicId,
                 KursId = id,
                 Tip = tip,
                 NastavnikJMBG = userJMBG,
@@ -212,6 +213,78 @@ namespace MoodleCloneAPI.Data.Services
 
             dbContext.Materijali.Add(materijal);
             dbContext.SaveChanges();
+
+            return materijal;
+        }
+
+        public Materijal IzbrisiMaterijal(int id)
+        {
+            var userJMBG = userService.GetAuthUserId();
+            var role = userService.GetAuthUserRole();
+            var materijal = dbContext.Materijali.FirstOrDefault(m => m.Id == id) ?? throw new Exception("Materijal nije pronadjen");
+            var course = dbContext.Kursevi.FirstOrDefault(k => k.Id == materijal.KursId) ?? throw new Exception("Kurs nije pronadjen");
+            if (course.ProfesorJMBG != userJMBG && course.AsistentJMBG != userJMBG)
+                throw new Exception("Nemate pristup ovom kursu");
+            if(role == "Profesor" && materijal.Tip == "Vezbe")
+                throw new Exception("Nemate pristup ovom kursu");
+            if(role == "Asistent" && materijal.Tip == "Predavanja")
+                throw new Exception("Nemate pristup ovom kursu");
+
+            dbContext.Materijali.Remove(materijal);
+            dbContext.SaveChanges();
+            return materijal;
+        }
+
+        public Materijal AzurirajMaterijal(MaterijalVM request, int id)
+        {
+            var userJMBG = userService.GetAuthUserId();
+            var role = userService.GetAuthUserRole();
+            var materijal = dbContext.Materijali.FirstOrDefault(m => m.Id == id) ?? throw new Exception("Materijal nije pronadjen");
+            var course = dbContext.Kursevi.FirstOrDefault(k => k.Id == materijal.KursId) ?? throw new Exception("Kurs nije pronadjen");
+            if (course.ProfesorJMBG != userJMBG && course.AsistentJMBG != userJMBG)
+                throw new Exception("Nemate pristup ovom kursu");
+            if (role == "Profesor" && materijal.Tip == "Vezbe")
+                throw new Exception("Nemate pristup ovom kursu");
+            if (role == "Asistent" && materijal.Tip == "Predavanja")
+                throw new Exception("Nemate pristup ovom kursu");
+
+            var fileName = Path.GetFileNameWithoutExtension(request.File.FileName);
+            var fileExtension = Path.GetExtension(request.File.FileName);
+            var tempPath = Path.Combine(Path.GetTempPath(), $"{fileName}{fileExtension}");
+            using (var stream = new FileStream(tempPath, FileMode.Create))
+            {
+                request.File.CopyTo(stream);
+            }
+            var guid = Guid.NewGuid().ToString();
+            var filePublicId = $"{configuration.GetSection("Cloudinary:FolderName").Value}/{guid}{fileExtension}";
+            var uploadParams = new RawUploadParams()
+            {
+                File = new FileDescription(tempPath),
+                PublicId = filePublicId,
+            };
+            var uploadResult = cloudinary.Upload(uploadParams);
+            cloudinary.Destroy(new DeletionParams(materijal.PublicId));
+
+            materijal.Naziv = request.Naziv;
+            materijal.Sadrzaj = uploadResult.Uri.ToString();
+            materijal.PublicId = uploadResult.PublicId;
+            dbContext.SaveChanges();
+
+            return materijal;
+        }
+
+        public Materijal GetMaterijal(int id)
+        {
+            var userJMBG = userService.GetAuthUserId();
+            var role = userService.GetAuthUserRole();
+            var materijal = dbContext.Materijali.FirstOrDefault(m => m.Id == id) ?? throw new Exception("Materijal nije pronadjen");
+            var course = dbContext.Kursevi.FirstOrDefault(k => k.Id == materijal.KursId) ?? throw new Exception("Kurs nije pronadjen");
+            if (course.ProfesorJMBG != userJMBG && course.AsistentJMBG != userJMBG)
+                throw new Exception("Nemate pristup ovom kursu");
+            if (role == "Profesor" && materijal.Tip == "Vezbe")
+                throw new Exception("Nemate pristup ovom kursu");
+            if (role == "Asistent" && materijal.Tip == "Predavanja")
+                throw new Exception("Nemate pristup ovom kursu");
 
             return materijal;
         }

@@ -120,5 +120,50 @@ namespace MoodleCloneAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("materijali/{id}")]
+        [Authorize(Roles = "Profesor,Asistent")]
+        public IActionResult GetMaterijal(int id)
+        {
+            try
+            {
+                var response = kursService.GetMaterijal(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("materijali/{id}")]
+        [Authorize(Roles = "Profesor,Asistent")]
+        public IActionResult IzbrisiMaterijal(int id)
+        {
+            try
+            {
+                var response = kursService.IzbrisiMaterijal(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("materijali/{id}")]
+        [Authorize(Roles = "Profesor,Asistent")]
+        public IActionResult AzurirajMaterijal(int id, [FromForm] MaterijalVM request)
+        {
+            try
+            {
+                var response = kursService.AzurirajMaterijal(request, id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

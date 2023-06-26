@@ -222,6 +222,11 @@ namespace MoodleCloneAPI.Data.Services
             return dbContext.Osobe.Find(id);
         }
 
+        public string GetAuthUserRole()
+        {
+            return httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
+        }
+
         public void SendEmail(string recipientEmail, string emailSubject, string emailText)
         {
             var email = new MimeMessage();
