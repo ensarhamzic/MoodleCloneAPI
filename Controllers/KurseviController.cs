@@ -46,6 +46,21 @@ namespace MoodleCloneAPI.Controllers
             }
         }
 
+        [HttpGet("moji")]
+        [Authorize(Roles = "Student")]
+        public IActionResult GetMyCourses()
+        {
+            try
+            {
+                var response = kursService.GetMyCourses();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("{id}/prijave")]
         [Authorize(Roles = "Profesor,Asistent")]
         public IActionResult GetApplications(int id)
@@ -159,6 +174,21 @@ namespace MoodleCloneAPI.Controllers
             {
                 var response = kursService.AzurirajMaterijal(request, id);
                 return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("materijali/{id}/pregled")]
+        [Authorize]
+        public IActionResult PregledajMaterijal(int id)
+        {
+            try
+            {
+                var response = kursService.PregledajMaterijal(id);
+                return Ok(new {url =  response});
             }
             catch (Exception ex)
             {

@@ -51,7 +51,7 @@ namespace MoodleCloneAPI.Data.Services
 
         public KursResponseVM GetCourseById(int id)
         {
-            var kurs = dbContext.Kursevi.Include(k => k.Asistent).Include(k => k.Profesor).Include(k => k.Materijali).Include(k => k.Smer).FirstOrDefault(k => k.Id == id) ?? throw new Exception("Kurs nije pronadjen");
+            var kurs = dbContext.Kursevi.Include(k => k.Asistent).ThenInclude(a => a.Osoba).Include(k => k.Profesor).ThenInclude(a => a.Osoba).Include(k => k.Materijali).Include(k => k.Smer).FirstOrDefault(k => k.Id == id) ?? throw new Exception("Kurs nije pronadjen");
             var userJMBG = userService.GetAuthUserId();
             if(userJMBG == null)
                 kurs.Materijali = null;
@@ -287,6 +287,48 @@ namespace MoodleCloneAPI.Data.Services
                 throw new Exception("Nemate pristup ovom kursu");
 
             return materijal;
+        }
+
+        public string PregledajMaterijal(int id)
+        {
+            var userJMBG = userService.GetAuthUserId();
+            var role = userService.GetAuthUserRole();
+            var materijal = dbContext.Materijali.FirstOrDefault(m => m.Id == id) ?? throw new Exception("Materijal nije pronadjen");
+            var kurs = dbContext.Kursevi.Include(k => k.Materijali).Include(k => k.Studenti).FirstOrDefault(k => k.Id == materijal.KursId) ?? throw new Exception("Kurs nije pronadjen");
+            if(role == "Student")
+            {
+                if(dbContext.PrijaveKurseva.FirstOrDefault(pk => pk.KursId == kurs.Id && pk.StudentJMBG == userJMBG && !pk.NaCekanju) == null)
+                    throw new Exception("Nemate pristup ovom kursu");
+                List<int> prethodniMaterijaliIds = kurs.Materijali.Where(m => m.Datum < materijal.Datum && m.Tip == materijal.Tip).Select(m => m.Id).ToList();
+                List<int> studentMaterijaliIds = dbContext.StudentiMaterijali.Where(sm => sm.StudentJMBG == userJMBG && prethodniMaterijaliIds.Contains(sm.MaterijalId)).Select(sm => sm.MaterijalId).ToList();
+                if(kurs.HronoloskiMod)
+                {
+                    bool pregledaoSvePrethodne = prethodniMaterijaliIds.All(pm => studentMaterijaliIds.Any(sm => sm == pm));
+                    if (!pregledaoSvePrethodne)
+                        throw new Exception("Nemate pristup ovom materijalu");
+                }
+                bool pregledaoMaterijal = dbContext.StudentiMaterijali.FirstOrDefault(sm => sm.StudentJMBG == userJMBG && sm.MaterijalId == id) != null;
+                if (!pregledaoMaterijal)
+                {
+                    var studentMaterijalNovi = new StudentMaterijal()
+                    {
+                        StudentJMBG = userJMBG,
+                        MaterijalId = id,
+                    };
+                    dbContext.StudentiMaterijali.Add(studentMaterijalNovi);
+                    dbContext.SaveChanges();
+                }
+            }
+
+            return materijal.Sadrzaj;
+        }
+
+        public List<Kurs> GetMyCourses()
+        {
+            var userJMBG = userService.GetAuthUserId();
+            var role = userService.GetAuthUserRole();
+            List<Kurs> kursevi = dbContext.PrijaveKurseva.Include(pk => pk.Kurs).ThenInclude(k => k.Profesor).ThenInclude(p => p.Osoba).Include(pk => pk.Kurs).ThenInclude(k => k.Asistent).ThenInclude(p => p.Osoba).Where(pk => pk.StudentJMBG == userJMBG && !pk.NaCekanju).Select(pk => pk.Kurs).ToList();
+            return kursevi;
         }
     }
 }
