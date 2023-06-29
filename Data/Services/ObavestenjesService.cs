@@ -36,7 +36,7 @@ namespace MoodleCloneAPI.Data.Services
             var kurs = dbContext.Kursevi.FirstOrDefault(k => k.Id == kursId);
             if(kurs == null)
                 throw new Exception("Kurs nije pronadjen");
-            var obavestenja = dbContext.Obavestenja.Where(o => o.KursId == kursId).OrderByDescending(o => o.Datum).AsQueryable();
+            var obavestenja = dbContext.Obavestenja.Where(o => o.KursId == kursId).Include(o => o.Nastavnik).ThenInclude(n => n.Osoba).OrderByDescending(o => o.Datum).AsQueryable();
             if (num != null)
                 obavestenja = obavestenja.Take(num.GetValueOrDefault(5));
             return obavestenja.ToList();
@@ -46,7 +46,7 @@ namespace MoodleCloneAPI.Data.Services
         {
             var userJMBG = userService.GetAuthUserId();
             var role = userService.GetAuthUserRole();
-            var obavestenje = dbContext.Obavestenja.Include(o => o.Nastavnik).Include(o => o.Kurs).Include(o => o.Studenti).ThenInclude(s => s.Student).ThenInclude(s => s.Osoba).FirstOrDefault(o => o.Id == id);
+            var obavestenje = dbContext.Obavestenja.Include(o => o.Nastavnik).ThenInclude(n => n.Osoba).Include(o => o.Kurs).Include(o => o.Studenti).ThenInclude(s => s.Student).ThenInclude(s => s.Osoba).FirstOrDefault(o => o.Id == id);
             if(obavestenje == null)
                 throw new Exception("Obavestenje nije pronadjeno");
             if(role == "Student")

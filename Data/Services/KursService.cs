@@ -65,7 +65,7 @@ namespace MoodleCloneAPI.Data.Services
                 brojPrijava = dbContext.PrijaveKurseva.Where(p => p.KursId == kurs.Id && p.NaCekanju).Count();
             }
                 
-            
+            List<int> pregledaniMaterijaliIds = new List<int>();
             var student = dbContext.Studenti.FirstOrDefault(s => s.OsobaJMBG == userJMBG);
             if (student != null)
             {
@@ -76,6 +76,10 @@ namespace MoodleCloneAPI.Data.Services
                 {
                     kurs.Materijali = null;
                     pending = true;
+                } else
+                {
+                    var materijaliIds = kurs.Materijali.Select(m => m.Id).ToList();
+                    pregledaniMaterijaliIds = dbContext.StudentiMaterijali.Where(pm => pm.StudentJMBG == student.OsobaJMBG && materijaliIds.Contains(pm.MaterijalId)).Select(pm => pm.MaterijalId).ToList();
                 }
             }
             return new KursResponseVM()
@@ -83,7 +87,8 @@ namespace MoodleCloneAPI.Data.Services
                 Kurs = kurs,
                 CanManage = canManage,
                 Pending = pending,
-                BrojPrijava = brojPrijava
+                BrojPrijava = brojPrijava,
+                PregledaniMaterijaliIds = pregledaniMaterijaliIds
             };
         }
 
@@ -327,7 +332,7 @@ namespace MoodleCloneAPI.Data.Services
         {
             var userJMBG = userService.GetAuthUserId();
             var role = userService.GetAuthUserRole();
-            List<Kurs> kursevi = dbContext.PrijaveKurseva.Include(pk => pk.Kurs).ThenInclude(k => k.Profesor).ThenInclude(p => p.Osoba).Include(pk => pk.Kurs).ThenInclude(k => k.Asistent).ThenInclude(p => p.Osoba).Where(pk => pk.StudentJMBG == userJMBG && !pk.NaCekanju).Select(pk => pk.Kurs).ToList();
+            List<Kurs> kursevi = dbContext.PrijaveKurseva.Include(pk => pk.Kurs).ThenInclude(k => k.Profesor).ThenInclude(p => p.Osoba).Include(pk => pk.Kurs).ThenInclude(k => k.Asistent).ThenInclude(p => p.Osoba).Include(p => p.Kurs).ThenInclude(p => p.Smer).Where(pk => pk.StudentJMBG == userJMBG && !pk.NaCekanju).Select(pk => pk.Kurs).ToList();
             return kursevi;
         }
     }

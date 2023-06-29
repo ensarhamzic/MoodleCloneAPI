@@ -8,5 +8,6 @@ namespace MoodleCloneAPI.Data.ViewModels.Responses
         public bool CanManage { get; set; }
         public bool Pending { get; set; }
         public int? BrojPrijava { get; set; }
+        public List<int> PregledaniMaterijaliIds { get; set; }
     }
 }
