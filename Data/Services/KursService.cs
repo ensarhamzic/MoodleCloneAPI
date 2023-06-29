@@ -126,6 +126,8 @@ namespace MoodleCloneAPI.Data.Services
             var student = dbContext.Studenti.Include(s => s.Osoba).FirstOrDefault(s => s.OsobaJMBG == userJMBG) ?? throw new Exception("Student nije pronadjen");
             var course = dbContext.Kursevi.FirstOrDefault(k => k.Id == id) ?? throw new Exception("Kurs nije pronadjen");
             var studentCourse = dbContext.PrijaveKurseva.FirstOrDefault(sk => sk.StudentJMBG == student.OsobaJMBG && sk.KursId == course.Id);
+            if(dbContext.StudentiSmerovi.FirstOrDefault(ss => ss.StudentJMBG == userJMBG && ss.SmerId == course.SmerId) == null)
+                throw new Exception("Niste upisani na smer na kojem je kurs");
             if (studentCourse != null)
             {
                 dbContext.PrijaveKurseva.Remove(studentCourse);

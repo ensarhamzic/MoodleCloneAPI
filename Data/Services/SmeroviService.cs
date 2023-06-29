@@ -25,6 +25,19 @@ namespace MoodleCloneAPI.Data.Services
             return dbContext.Smerovi.Find(id);
         }
 
+        public Smer DodajSmer(SmerVM request)
+        {
+            if (dbContext.Smerovi.Any(s => s.Naziv == request.Naziv))
+                throw new Exception("Smer sa tim nazivom vec postoji");
+            var smer = new Smer
+            {
+                Naziv = request.Naziv
+            };
+            dbContext.Smerovi.Add(smer);
+            dbContext.SaveChanges();
+            return smer;
+        }
+
         public bool IndexExists(string brojIndeksa)
         {
             var studentSmer = dbContext.StudentiSmerovi

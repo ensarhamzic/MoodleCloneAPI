@@ -47,6 +47,21 @@ namespace MoodleCloneAPI.Controllers
 
         }
 
+        [HttpPost("novi")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult DodajSmer(SmerVM request)
+        {
+            try
+            {
+                var result = smeroviService.DodajSmer(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public IActionResult DodajStudentaNaSmer(StudentSmerVM request)
