@@ -175,11 +175,11 @@ namespace MoodleCloneAPI.Controllers
         }
 
         [HttpGet("students")]
-        public IActionResult GetStudents()
+        public IActionResult GetStudents(string? query)
         {
             try
             {
-                var response = userService.GetStudents();
+                var response = userService.GetStudents(query);
                 return Ok(response);
             }
             catch (Exception ex)

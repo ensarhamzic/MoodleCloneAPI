@@ -19,9 +19,9 @@ namespace MoodleCloneAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetSmerovi()
+        public IActionResult GetSmerovi(string? query)
         {
-            var result = smeroviService.GetSmerovi();
+            var result = smeroviService.GetSmerovi(query);
             return Ok(result);
         }
 

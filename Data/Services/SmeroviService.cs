@@ -15,9 +15,15 @@ namespace MoodleCloneAPI.Data.Services
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public List<Smer> GetSmerovi()
+        public List<Smer> GetSmerovi(string? query)
         {
-            return dbContext.Smerovi.AsQueryable().Include(s => s.Kursevi).ToList();
+            IQueryable<Smer> smerovi = dbContext.Smerovi.AsQueryable().Include(s => s.Kursevi);
+            if(query != null)
+            {
+                foreach(Smer smer in smerovi)
+                    smer.Kursevi = smer.Kursevi.Where(k => k.Naziv.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            return smerovi.ToList();
         }
 
         public Smer GetSmer(int id)

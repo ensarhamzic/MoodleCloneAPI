@@ -285,9 +285,20 @@ namespace MoodleCloneAPI.Data.Services
             return dbContext.Nastavnici.Where(n => n.Verifikovan == false).Include(n => n.Osoba).Include(n => n.Zvanje).Include(n => n.Tip).ToList();
         }
 
-        public List<Student> GetStudents()
+        public List<Student> GetStudents(string? query)
         {
-            return dbContext.Studenti.Include(s => s.Osoba).ToList();
+            IQueryable<Student> students = dbContext.Studenti.Include(s => s.Osoba);
+            if(query != null)
+            {
+                students = students
+                    .Where(
+                        s => s.Osoba.Ime.Contains(query)
+                        || s.Osoba.Prezime.Contains(query)
+                        || (s.Osoba.Ime + " " + s.Osoba.Prezime).Contains(query)
+                        || (s.Osoba.Prezime + " " + s.Osoba.Ime).Contains(query)
+                        );
+            }
+            return students.ToList();
         }
 
         public string VerifyTeacher(string jmbg)
